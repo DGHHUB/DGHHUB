@@ -2,6 +2,15 @@ local Player = game.Players.LocalPlayer
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 local ProximityPromptService = game:GetService("ProximityPromptService")
+local StarterGui = game:GetService("StarterGui")
+local SoundService = game:GetService("SoundService")
+
+-- 0. TẠO ÂM THANH THÔNG BÁO
+local NotifySound = Instance.new("Sound")
+NotifySound.Name = "NotifySound"
+NotifySound.SoundId = "rbxassetid://203783772" 
+NotifySound.Volume = 0.5
+NotifySound.Parent = SoundService
 
 -- 1. TẠO SCREEN GUI
 local ScreenGui = Instance.new("ScreenGui")
@@ -12,7 +21,7 @@ ScreenGui.ResetOnSpawn = false
 -- 2. KHUNG CHÍNH (MAIN FRAME)
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 260, 0, 180) -- Tăng chiều cao để chứa 2 nút
+MainFrame.Size = UDim2.new(0, 260, 0, 180)
 MainFrame.Position = UDim2.new(0.5, -130, 0.5, -90)
 MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
 MainFrame.BorderSizePixel = 0
@@ -44,7 +53,7 @@ Title.Parent = MainFrame
 local SubTitle = Instance.new("TextLabel")
 SubTitle.Size = UDim2.new(1, -30, 0, 15)
 SubTitle.Position = UDim2.new(0, 15, 0, 28)
-SubTitle.Text = "Script Bởi Gemini 🇻🇳"
+SubTitle.Text = "script làm bằng gemini :) 🇻🇳"
 SubTitle.TextColor3 = Color3.fromRGB(160, 160, 160)
 SubTitle.TextXAlignment = Enum.TextXAlignment.Left
 SubTitle.Font = Enum.Font.Gotham
@@ -79,11 +88,15 @@ BtnCorner1.CornerRadius = UDim.new(0, 8)
 BtnCorner1.Parent = SecretBtn
 
 local Accent1 = Instance.new("Frame")
-Accent1.Size = UDim2.new(0, 3, 0.5, 0)
-Accent1.Position = UDim2.new(0, 6, 0.25, 0)
+Accent1.Size = UDim2.new(0, 4, 0.5, 0)
+Accent1.Position = UDim2.new(0, 8, 0.25, 0)
 Accent1.BackgroundColor3 = Color3.fromRGB(130, 90, 230)
 Accent1.BorderSizePixel = 0
 Accent1.Parent = SecretBtn
+
+local Accent1Corner = Instance.new("UICorner")
+Accent1Corner.CornerRadius = UDim.new(1, 0) -- Bo tròn hoàn toàn
+Accent1Corner.Parent = Accent1
 
 local targetCFrame = CFrame.new(2607.50, -2.64, 0.00)
 local activateTeleport = false
@@ -107,7 +120,7 @@ Player.CharacterAdded:Connect(function(char)
 end)
 
 -----------------------------------------------------------
--- 5. NÚT INSTANT SKIP E (🔴/🟢)
+-- 5. NÚT NHẶT NHANH (XÓA KHOẢNG TRỐNG NOTIFY)
 -----------------------------------------------------------
 local InstantBtn = Instance.new("TextButton")
 InstantBtn.Name = "InstantBtn"
@@ -126,11 +139,15 @@ BtnCorner2.CornerRadius = UDim.new(0, 8)
 BtnCorner2.Parent = InstantBtn
 
 local Accent2 = Instance.new("Frame")
-Accent2.Size = UDim2.new(0, 3, 0.5, 0)
-Accent2.Position = UDim2.new(0, 6, 0.25, 0)
-Accent2.BackgroundColor3 = Color3.fromRGB(200, 50, 50) -- Đỏ mặc định
+Accent2.Size = UDim2.new(0, 4, 0.5, 0)
+Accent2.Position = UDim2.new(0, 8, 0.25, 0)
+Accent2.BackgroundColor3 = Color3.fromRGB(200, 50, 50) 
 Accent2.BorderSizePixel = 0
 Accent2.Parent = InstantBtn
+
+local Accent2Corner = Instance.new("UICorner")
+Accent2Corner.CornerRadius = UDim.new(1, 0) -- Bo tròn hoàn toàn
+Accent2Corner.Parent = Accent2
 
 local isInstantActive = false
 
@@ -139,15 +156,22 @@ InstantBtn.MouseButton1Click:Connect(function()
     if isInstantActive then
         InstantBtn.Text = "NHẶT NHANH 🟢"
         InstantBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        Accent2.BackgroundColor3 = Color3.fromRGB(50, 200, 50) -- Xanh khi bật
+        Accent2.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+        
+        NotifySound:Play()
+        -- Gửi thông báo không có Icon để xóa khoảng trống
+        StarterGui:SetCore("SendNotification", {
+            Title = "Cảnh báo ⚠️",
+            Text = "Khi Bạn Gift Brainrot Rất Nhanh Hãy Cẩn Thận Khi Cẩm Brainrot Gần Chơi Khác!",
+            Duration = 5
+        })
     else
-        InstantBtn.Text = "NHẶT NHANH🔴"
+        InstantBtn.Text = "NHẶT NHANH 🔴"
         InstantBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
-        Accent2.BackgroundColor3 = Color3.fromRGB(200, 50, 50) -- Đỏ khi tắt
+        Accent2.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
     end
 end)
 
--- Logic xử lý tương tác ngay lập tức
 ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
     if isInstantActive then
         fireproximityprompt(prompt)
