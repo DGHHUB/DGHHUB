@@ -1,0 +1,167 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+
+-- CẤU HÌNH TOẠ ĐỘ
+local posFarmGap = Vector3.new(1425.82, 272.14, 2350.57)
+local posFarmLv = Vector3.new(-41.75, 34.93, -3.88)
+
+local waitTime = 0.5 
+local isTeleportingGap = false
+local isTeleportingLv = false
+
+-- --- TẠO GIAO DIỆN (UI) ---
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "Gemini_MultiFarm_Menu"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Khung chính (Tăng chiều cao lên 210 để chứa 2 nút)
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 280, 0, 210)
+mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+mainFrame.BackgroundColor3 = Color3.fromRGB(10, 12, 15)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 10)
+mainCorner.Parent = mainFrame
+
+local mainStroke = Instance.new("UIStroke")
+mainStroke.Thickness = 1.5
+mainStroke.Color = Color3.fromRGB(40, 70, 90)
+mainStroke.Parent = mainFrame
+
+-- Tiêu đề (Size 16)
+local title = Instance.new("TextLabel")
+title.Text = "AUTO FARM 🏆"
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Position = UDim2.new(0, 15, 0, 5)
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+title.Parent = mainFrame
+
+local subTitle = Instance.new("TextLabel")
+subTitle.Text = "Script Làm Bởi Gemini :) 🇻🇳"
+subTitle.Size = UDim2.new(1, 0, 0, 20)
+subTitle.Position = UDim2.new(0, 15, 0, 25)
+subTitle.BackgroundTransparency = 1
+subTitle.TextColor3 = Color3.fromRGB(150, 150, 150)
+subTitle.TextXAlignment = Enum.TextXAlignment.Left
+subTitle.Font = Enum.Font.SourceSans
+subTitle.TextSize = 11
+subTitle.Parent = mainFrame
+
+-- HÀM TẠO NÚT BẤM CHUNG (Để tiết kiệm code và đồng nhất phông chữ Size 14)
+local function createFarmButton(name, posIndex)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0.9, 0, 0, 45)
+	btn.Position = UDim2.new(0.5, 0, 0, 80 + (posIndex * 55))
+	btn.AnchorPoint = Vector2.new(0.5, 0)
+	btn.BackgroundColor3 = Color3.fromRGB(20, 22, 25)
+	btn.Text = name
+	btn.TextColor3 = Color3.fromRGB(230, 230, 230)
+	btn.Font = Enum.Font.GothamBold
+	btn.TextSize = 14
+	btn.BorderSizePixel = 0
+	btn.AutoButtonColor = false
+	btn.Parent = mainFrame
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 6)
+	corner.Parent = btn
+
+	local sideBar = Instance.new("Frame")
+	sideBar.Size = UDim2.new(0, 4, 0.5, 0)
+	sideBar.Position = UDim2.new(0, 10, 0.25, 0)
+	sideBar.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+	sideBar.BorderSizePixel = 0
+	sideBar.Parent = btn
+
+	local barCorner = Instance.new("UICorner")
+	barCorner.CornerRadius = UDim.new(1, 0)
+	barCorner.Parent = sideBar
+
+	return btn, sideBar
+end
+
+-- Tạo 2 nút bấm
+local btnGap, barGap = createFarmButton("AUTO FARM", 0)
+local btnLv, barLv = createFarmButton("AUTO FARM LV 🏃", 1)
+
+-- --- HÀM KÉO THẢ ---
+local dragging, dragInput, dragStart, startPos
+local function update(input)
+	local delta = input.Position - dragStart
+	mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+mainFrame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = mainFrame.Position
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then dragging = false end
+		end)
+	end
+end)
+mainFrame.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
+	end
+end)
+UserInputService.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then update(input) end
+end)
+
+-- --- LOGIC DỊCH CHUYỂN ---
+task.spawn(function()
+	while true do
+		local char = player.Character
+		if char and char:FindFirstChild("HumanoidRootPart") then
+			if isTeleportingGap then
+				char.HumanoidRootPart.CFrame = CFrame.new(posFarmGap)
+			elseif isTeleportingLv then
+				char.HumanoidRootPart.CFrame = CFrame.new(posFarmLv)
+			end
+		end
+		task.wait(0.001)
+	end
+end)
+
+-- Sự kiện nút AUTO FARM
+btnGap.MouseButton1Click:Connect(function()
+	isTeleportingGap = not isTeleportingGap
+	if isTeleportingGap then
+		isTeleportingLv = false -- Tắt cái kia nếu đang bật
+		btnGap.Text = "DỪNG FARM 🏆"
+		barGap.BackgroundColor3 = Color3.fromRGB(50, 255, 50)
+		-- Reset nút còn lại
+		btnLv.Text = "AUTO FARM TỐC ĐỘ 🏃"
+		barLv.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+	else
+		btnGap.Text = "AUTO FARM 🏆"
+		barGap.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+	end
+end)
+
+-- Sự kiện nút AUTO FARM LV
+btnLv.MouseButton1Click:Connect(function()
+	isTeleportingLv = not isTeleportingLv
+	if isTeleportingLv then
+		isTeleportingGap = false -- Tắt cái kia nếu đang bật
+		btnLv.Text = "DỪNG FARM TỐC ĐỘ 🏃"
+		barLv.BackgroundColor3 = Color3.fromRGB(50, 255, 50)
+		-- Reset nút còn lại
+		btnGap.Text = "AUTO FARM 🏆"
+		barGap.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+	else
+		btnLv.Text = "AUTO FARM TỐC ĐỘ 🏃"
+		barLv.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+	end
+end)
