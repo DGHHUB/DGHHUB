@@ -77,9 +77,9 @@ SecretBtn.Size = UDim2.new(0.9, 0, 0, 45)
 SecretBtn.Position = UDim2.new(0.05, 0, 0, 60)
 SecretBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 SecretBtn.Text = "TP TỚI HỐ CUỐI"
-SecretBtn.TextColor3 = Color3.fromRGB(230, 230, 230)
-SecretBtn.Font = Enum.Font.GothamMedium
-SecretBtn.TextSize = 12
+SecretBtn.TextColor3 = Color3.fromRGB(255, 255, 255) -- Chữ trắng sáng
+SecretBtn.Font = Enum.Font.GothamBold
+SecretBtn.TextSize = 16
 SecretBtn.AutoButtonColor = true
 SecretBtn.Parent = MainFrame
 
@@ -95,14 +95,32 @@ Accent1.BorderSizePixel = 0
 Accent1.Parent = SecretBtn
 
 local Accent1Corner = Instance.new("UICorner")
-Accent1Corner.CornerRadius = UDim.new(1, 0) -- Bo tròn hoàn toàn
+Accent1Corner.CornerRadius = UDim.new(1, 0)
 Accent1Corner.Parent = Accent1
 
 local targetCFrame = CFrame.new(2607.50, -2.64, 0.00)
 local activateTeleport = false
 
 SecretBtn.MouseButton1Click:Connect(function()
+    if activateTeleport then return end
     activateTeleport = true
+    
+    task.spawn(function()
+        while activateTeleport do
+            SecretBtn.Text = "⏳ Đang Dịch Chuyển"
+            task.wait(0.4)
+            if not activateTeleport then break end
+            SecretBtn.Text = "⏳ Đang Dịch Chuyển."
+            task.wait(0.4)
+            if not activateTeleport then break end
+            SecretBtn.Text = "⏳ Đang Dịch Chuyển.."
+            task.wait(0.4)
+            if not activateTeleport then break end
+            SecretBtn.Text = "⏳ Đang Dịch Chuyển..."
+            task.wait(0.4)
+        end
+    end)
+    
     if Player.Character and Player.Character:FindFirstChildOfClass("Humanoid") then
         Player.Character:FindFirstChildOfClass("Humanoid").Health = 0
     end
@@ -112,25 +130,26 @@ Player.CharacterAdded:Connect(function(char)
     if activateTeleport then
         local hrp = char:WaitForChild("HumanoidRootPart", 10)
         if hrp then
-            task.wait(0)
+            task.wait(0.000000000000000000000000000000000000000000000000000000000000000000001)
             hrp.CFrame = targetCFrame
             activateTeleport = false
+            SecretBtn.Text = "TP TỚI HỐ CUỐI"
         end
     end
 end)
 
 -----------------------------------------------------------
--- 5. NÚT NHẶT NHANH (XÓA KHOẢNG TRỐNG NOTIFY)
+-- 5. NÚT NHẶT NHANH (ĐÃ SỬA CHỮ MỜ)
 -----------------------------------------------------------
 local InstantBtn = Instance.new("TextButton")
 InstantBtn.Name = "InstantBtn"
 InstantBtn.Size = UDim2.new(0.9, 0, 0, 45)
 InstantBtn.Position = UDim2.new(0.05, 0, 0, 115)
 InstantBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-InstantBtn.Text = "NHẶT NHANH"
-InstantBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
-InstantBtn.Font = Enum.Font.GothamMedium
-InstantBtn.TextSize = 12
+InstantBtn.Text = "NHẶT NHANH 🔴" -- Mặc định là đỏ
+InstantBtn.TextColor3 = Color3.fromRGB(255, 255, 255) -- Chữ trắng sáng rõ nét
+InstantBtn.Font = Enum.Font.GothamBold
+InstantBtn.TextSize = 16
 InstantBtn.AutoButtonColor = true
 InstantBtn.Parent = MainFrame
 
@@ -146,7 +165,7 @@ Accent2.BorderSizePixel = 0
 Accent2.Parent = InstantBtn
 
 local Accent2Corner = Instance.new("UICorner")
-Accent2Corner.CornerRadius = UDim.new(1, 0) -- Bo tròn hoàn toàn
+Accent2Corner.CornerRadius = UDim.new(1, 0)
 Accent2Corner.Parent = Accent2
 
 local isInstantActive = false
@@ -155,21 +174,20 @@ InstantBtn.MouseButton1Click:Connect(function()
     isInstantActive = not isInstantActive
     if isInstantActive then
         InstantBtn.Text = "NHẶT NHANH 🟢"
-        InstantBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
         Accent2.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
         
         NotifySound:Play()
-        -- Gửi thông báo không có Icon để xóa khoảng trống
         StarterGui:SetCore("SendNotification", {
             Title = "Cảnh báo ⚠️",
-            Text = "Khi Bạn Gift Brainrot Rất Nhanh Hãy Cẩn Thận Khi Cẩm Brainrot Gần Chơi Khác!",
-            Duration = 5
+            Text = "Khi Bạn Gift Brainrot Rất Nhanh Hãy Cẩn Thận Khi Cầm Brainrot Gần Người Chơi Khác!",
+            Duration = 6
         })
     else
         InstantBtn.Text = "NHẶT NHANH 🔴"
-        InstantBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
         Accent2.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
     end
+    -- Đảm bảo chữ luôn trắng dù bật hay tắt
+    InstantBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 end)
 
 ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
