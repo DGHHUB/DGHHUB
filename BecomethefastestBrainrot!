@@ -36,7 +36,7 @@ mainStroke.Parent = mainFrame
 
 -- Tiêu đề (Size 16)
 local title = Instance.new("TextLabel")
-title.Text = "BECOME THE FASTEST BRAINROT 🧠"
+title.Text = "BECOME THE FASTEST BRAINROT 🏃"
 title.Size = UDim2.new(1, 0, 0, 40)
 title.Position = UDim2.new(0, 15, 0, 5)
 title.BackgroundTransparency = 1
@@ -165,5 +165,6 @@ btnLv.MouseButton1Click:Connect(function()
 		barLv.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
 	end
 end)
+
 
 
