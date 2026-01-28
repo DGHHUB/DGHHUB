@@ -92,7 +92,7 @@ end
 
 -- Tạo 2 nút bấm
 local btnGap, barGap = createFarmButton("AUTO FARM", 0)
-local btnLv, barLv = createFarmButton("AUTO FARM LV 🏃", 1)
+local btnLv, barLv = createFarmButton("AUTO FARM TỐC ĐỘ 🏃", 1)
 
 -- --- HÀM KÉO THẢ ---
 local dragging, dragInput, dragStart, startPos
@@ -165,3 +165,4 @@ btnLv.MouseButton1Click:Connect(function()
 		barLv.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
 	end
 end)
+
